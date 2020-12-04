@@ -18,6 +18,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'document',
+        'balance',
         'email',
         'password',
     ];
@@ -30,6 +32,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verified_at',
+        'created_at',
+        'updated_at'
     ];
 
     /**
@@ -39,5 +44,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'balance' => 'float'
     ];
 }
