@@ -30,4 +30,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'transaction' => [
+        'approver' => env('TRANSACTION_APPROVER_ENDPOINT'),
+        'notifier' => env('TRANSACTION_NOTIFIER_ENDPOINT'),
+    ]
 ];
