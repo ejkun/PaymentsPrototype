@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use App\Rules\Cnpj;
 use App\Rules\Cpf;
 use App\Rules\OneOf;
 use App\Rules\PasswordConfirmation;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreUser extends FormRequest
 {
@@ -29,6 +31,13 @@ class StoreUser extends FormRequest
     {
         return [
             'name' => 'required|string',
+            'type' => [
+                'required',
+                Rule::in([
+                    User::REGULAR,
+                    User::MERCHANT
+                ])
+            ],
             'document' => [
                 'required',
                 new OneOf("The data must be a valid CPF or CNPJ", new Cpf(), new Cnpj())

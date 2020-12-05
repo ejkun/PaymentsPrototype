@@ -23,7 +23,9 @@ class TransactionServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->payer = User::factory()->create();
+        $this->payer = User::factory()->create([
+            'type' => User::REGULAR
+        ]);
         $this->payee = User::factory()->create();
         $this->service = app(TransactionService::class);
     }
@@ -43,7 +45,7 @@ class TransactionServiceTest extends TestCase
 
     public function testItStoresATransaction()
     {
-        $value = $this->faker->randomFloat(2, 1, $this->payer->balance);
+        $value = $this->faker->randomFloat(2, 0.01, $this->payer->balance);
 
         $transaction = $this->service->store($this->payer, $this->payee, $value);
 

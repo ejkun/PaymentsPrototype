@@ -11,6 +11,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    public const REGULAR = 1;
+    public const MERCHANT = 2;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -19,6 +22,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'document',
+        'type',
         'balance',
         'email',
         'password',

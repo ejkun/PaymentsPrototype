@@ -22,7 +22,9 @@ class TransactionControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->payer = User::factory()->create();
+        $this->payer = User::factory()->create([
+            'type' => User::REGULAR
+        ]);
         $this->payee = User::factory()->create();
     }
 

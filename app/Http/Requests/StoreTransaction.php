@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTransaction extends FormRequest
 {
@@ -28,7 +30,12 @@ class StoreTransaction extends FormRequest
     public function rules()
     {
         return [
-            'payer_id' => 'required|exists:users,id',
+            'payer_id' => [
+                'required',
+                Rule::exists('users', 'id')->where(function (Builder $query) {
+                    $query->where('type', User::REGULAR);
+                }),
+            ],
             'payee_id' => 'required|exists:users,id',
             'value' => 'numeric|min:0|not_in:0'
         ];
