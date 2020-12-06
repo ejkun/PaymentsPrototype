@@ -5,12 +5,12 @@ namespace App\Exceptions;
 
 
 use Illuminate\Http\Response;
-use Throwable;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class InvalidPayerType extends \Exception
+class InvalidPayerType extends HttpException
 {
     public function __construct()
     {
-        parent::__construct("Invalid Payer Type", Response::HTTP_BAD_REQUEST);
+        parent::__construct(Response::HTTP_BAD_REQUEST, "Invalid Payer Type");
     }
 }

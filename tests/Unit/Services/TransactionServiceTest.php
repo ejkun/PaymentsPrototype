@@ -3,11 +3,13 @@
 namespace Tests\Unity\Services\UserServiceTest;
 
 use App\Exceptions\InsufficientFundsException;
+use App\Exceptions\TransactionRejectedByApprover;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\TransactionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class TransactionServiceTest extends TestCase
@@ -70,6 +72,25 @@ class TransactionServiceTest extends TestCase
         try {
             $this->service->store($this->payer, $this->payee, $value);
         } catch (InsufficientFundsException $exception) {
+            $this->assertTrue(true, 'This line was not called');
+        }
+
+        $this->assertDatabaseMissing('transactions', [
+            'payer_id' => $this->payer->id,
+            'payee_id' => $this->payee->id,
+            'value' => $value
+        ]);
+    }
+
+    public function testItThrowsTransactionRejectedByApprover()
+    {
+        Config::set('services.transaction.approver', '');
+
+        $value = $this->faker->randomFloat(2, 0.01, $this->payer->balance);
+
+        try {
+            $this->service->store($this->payer, $this->payee, $value);
+        } catch (TransactionRejectedByApprover $exception) {
             $this->assertTrue(true, 'This line was not called');
         }
 

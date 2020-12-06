@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Exceptions\InsufficientFundsException;
 use App\Exceptions\InvalidPayerType;
+use App\Exceptions\TransactionRejectedByApprover;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class TransactionService
 {
@@ -33,7 +35,9 @@ class TransactionService
             throw new InvalidPayerType();
         }
 
-        $transaction = null;
+        if (!$this->checkApprover()) {
+            throw new TransactionRejectedByApprover();
+        }
 
         try {
             DB::beginTransaction();
@@ -58,6 +62,17 @@ class TransactionService
         } catch (\Throwable $throwable) {
             DB::rollBack();
             throw $throwable;
+        }
+    }
+
+    protected function checkApprover(): bool
+    {
+        try {
+            $response = Http::acceptJson()->get(config('services.transaction.approver'));
+
+            return $response->successful() && $response->json('message') == 'Autorizado';
+        } catch (\Throwable $exception) {
+            return false;
         }
     }
 }
