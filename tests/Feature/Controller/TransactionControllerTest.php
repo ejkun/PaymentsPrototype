@@ -51,9 +51,7 @@ class TransactionControllerTest extends TestCase
         $response = $this->getJson(route('transactions.index'));
 
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJson([
-            'data' => $transactions
-        ]);
+            ->assertJson($transactions);
     }
 
     public function testApiShowsATransaction()

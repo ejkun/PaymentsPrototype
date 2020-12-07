@@ -21,9 +21,7 @@ class UserControllerTest extends TestCase
         $response = $this->getJson(route('users.index'));
 
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJson([
-                'data' => $users->toArray()
-            ]);
+            ->assertJson($users->toArray());
     }
 
     public function testApiShowsAUser()
@@ -33,9 +31,7 @@ class UserControllerTest extends TestCase
         $response = $this->getJson(route('users.show', ['user' => $user->id]));
 
         $response->assertStatus(Response::HTTP_OK)
-            ->assertJson([
-                'data' => $user->toArray()
-            ]);
+            ->assertJson($user->toArray());
     }
 
     public function testApiStoresAUser()
