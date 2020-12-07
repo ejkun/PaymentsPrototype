@@ -21,7 +21,11 @@ class CnpjTest extends TestCase
         ];
 
         array_walk($values, function ($expected, $cnpj) use ($validator) {
-            $this->assertEquals($expected, $validator->passes('cnpj', $cnpj));
+            $this->assertEquals(
+                $expected,
+                $validator->passes('cnpj', $cnpj),
+                "$cnpj is not a valid CNPJ"
+            );
         });
     }
 }

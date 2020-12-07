@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionObserver
 {
-    public function created(Transaction $transaction)
+    public function created(Transaction $transaction): void
     {
         SendTransactionNotification::dispatch($transaction);
     }

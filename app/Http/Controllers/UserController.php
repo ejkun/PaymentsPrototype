@@ -20,12 +20,14 @@ class UserController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
-        return UserResource::collection($this->service->index());
+        return new JsonResponse(
+            UserResource::collection($this->service->index())
+        );
     }
 
-    public function store(StoreUser $request)
+    public function store(StoreUser $request): JsonResponse
     {
         return new JsonResponse(
             new UserResource(
@@ -35,19 +37,21 @@ class UserController extends Controller
         );
     }
 
-    public function show(User $user)
+    public function show(User $user): JsonResponse
     {
-        return new UserResource($user);
+        return new JsonResponse(
+            new UserResource($user)
+        );
     }
 
-    public function update(UpdateUser $request, User $user)
+    public function update(UpdateUser $request, User $user): JsonResponse
     {
         $this->service->update($user, $request->validated());
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function destroy(DestroyUser $request, User $user)
+    public function destroy(DestroyUser $request, User $user): JsonResponse
     {
         $request->validated();
         $this->service->destroy($user);

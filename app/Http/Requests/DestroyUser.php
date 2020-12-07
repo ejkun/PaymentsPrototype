@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,8 +30,12 @@ class DestroyUser extends FormRequest
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
-                    if (!Hash::check($value, $this->route('user')->password)) {
-                        $fail("Current password is invalid");
+                    $user = $this->route('user');
+                    if (
+                        $user instanceof User &&
+                        !Hash::check($value, $user['password'])
+                    ) {
+                        $fail($attribute . " is invalid");
                     }
                 }
             ]

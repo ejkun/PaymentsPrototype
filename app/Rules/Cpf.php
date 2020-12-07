@@ -2,10 +2,13 @@
 
 namespace App\Rules;
 
+use App\Traits\HasRemoveNumbers;
 use Illuminate\Contracts\Validation\Rule;
 
 class Cpf implements Rule
 {
+    use HasRemoveNumbers;
+
     /**
      * Determine if the validation rule passes.
      *
@@ -14,27 +17,30 @@ class Cpf implements Rule
      * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function passes($attribute, $value)
     {
-        $cpf = preg_replace('/[^0-9]/', '', (string) $value);
+        $cpf = $this->removeNumbers((string) $value);
 
-        if (strlen($cpf) != 11)
+        if (strlen($cpf) != 11 || preg_match('/(\d)\1{10}/', $cpf)) {
             return false;
+        }
 
-        if (preg_match('/(\d)\1{10}/', $cpf))
-            return false;
-
-        for ($i = 0, $j = 10, $sum = 0; $i < 9; $i++, $j--)
-            $sum += $cpf[$i] * $j;
+        for ($i = 0, $j = 10, $sum = 0; $i < 9; $i++, $j--) {
+            $sum += intval($cpf[$i]) * $j;
+        }
 
         $remainder = $sum % 11;
 
-        if ($cpf[9] != ($remainder < 2 ? 0 : 11 - $remainder))
+        if ($cpf[9] != ($remainder < 2 ? 0 : 11 - $remainder)) {
             return false;
+        }
 
-        for ($i = 0, $j = 11, $sum = 0; $i < 10; $i++, $j--)
-            $sum += $cpf[$i] * $j;
+        for ($i = 0, $j = 11, $sum = 0; $i < 10; $i++, $j--) {
+            $sum += intval($cpf[$i]) * $j;
+        }
 
         $remainder = $sum % 11;
 

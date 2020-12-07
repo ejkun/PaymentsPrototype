@@ -9,7 +9,8 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     public const REGULAR = 1;
     public const MERCHANT = 2;
@@ -51,7 +52,7 @@ class User extends Authenticatable
         'balance' => 'float'
     ];
 
-    public function setDocumentAttribute(string $value)
+    public function setDocumentAttribute(string $value): void
     {
         $this->attributes['document'] = preg_replace('/\D/', '', $value);
     }

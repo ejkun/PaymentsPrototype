@@ -43,7 +43,12 @@ class StoreTransaction extends FormRequest
 
     protected function passedValidation()
     {
-        $this->payer = User::findOrFail($this['payer_id']);
-        $this->payee = User::findOrFail($this['payee_id']);
+        $this->payer = User::where([
+            'id' => $this['payer_id']
+        ])->firstOrFail();
+
+        $this->payee = User::where([
+            'id' => $this['payee_id']
+        ])->firstOrFail();
     }
 }

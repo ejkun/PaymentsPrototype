@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\Http;
 
 class SendTransactionNotification implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     private Transaction $transaction;
 
@@ -24,14 +27,17 @@ class SendTransactionNotification implements ShouldQueue
 
     public function handle(): void
     {
+        $payer = optional($this->transaction->payer);
+        $payee = optional($this->transaction->payee);
+
         $response = Http::post(config('services.transaction.notifier'), [
             'payee' => [
-                'id' => $this->transaction->payee->id,
-                'name' => $this->transaction->payee->name
+                'id' => $payee->id,
+                'name' => $payee->name
             ],
             'payer' => [
-                'id' => $this->transaction->payer->id,
-                'name' => $this->transaction->payer->name
+                'id' => $payer->id,
+                'name' => $payer->name
             ],
             'value' => $this->transaction->value
         ]);

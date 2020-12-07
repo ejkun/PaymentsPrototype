@@ -19,12 +19,14 @@ class TransactionController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
-        return TransactionResource::collection(Transaction::all());
+        return new JsonResponse(
+            TransactionResource::collection(Transaction::all())
+        );
     }
 
-    public function store(StoreTransaction $request)
+    public function store(StoreTransaction $request): JsonResponse
     {
         return new JsonResponse(
             new TransactionResource(
@@ -38,7 +40,7 @@ class TransactionController extends Controller
         );
     }
 
-    public function show(Transaction $transaction)
+    public function show(Transaction $transaction): JsonResponse
     {
         return new JsonResponse(
             new TransactionResource($transaction),

@@ -2,49 +2,58 @@
 
 namespace App\Rules;
 
+use App\Traits\HasRemoveNumbers;
 use Illuminate\Contracts\Validation\Rule;
 
 class Cnpj implements Rule
 {
+    use HasRemoveNumbers;
+
     /**
      * Determine if the validation rule passes.
      *
-     * Based on https://gist.github.com/guisehn/3276302
+     * Based on https://www.geradorcnpj.com/script-validar-cnpj-php.htm
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function passes($attribute, $value)
     {
-        $cnpj = preg_replace('/[^0-9]/', '', (string) $value);
+        $cnpj = $this->removeNumbers($value);
 
-        if (strlen($cnpj) != 14)
+        if (
+            strlen($cnpj) != 14 ||
+            preg_match('/(\d)\1{13}/', $cnpj)
+        ) {
             return false;
-
-        if (preg_match('/(\d)\1{13}/', $cnpj))
-            return false;
-
-        for ($i = 0, $j = 5, $sum = 0; $i < 12; $i++)
-        {
-            $sum += $cnpj[$i] * $j;
-            $j = ($j == 2) ? 9 : $j - 1;
         }
 
-        $remainder = $sum % 11;
+        $firstSum = 0;
+        $secondSum = 0;
 
-        if ($cnpj[12] != ($remainder < 2 ? 0 : 11 - $remainder))
-            return false;
+        for ($i = 0, $j = 5, $k = 6; $i < 12; $i++) {
+            $j = $j == 1 ? 9 : $j;
+            $k = $k == 1 ? 9 : $k;
 
-        for ($i = 0, $j = 6, $sum = 0; $i < 13; $i++)
-        {
-            $sum += $cnpj[$i] * $j;
-            $j = ($j == 2) ? 9 : $j - 1;
+            $secondSum += intval($cnpj[$i]) * $k;
+            $firstSum += intval($cnpj[$i]) * $j;
+
+            $k--;
+            $j--;
         }
 
-        $remainder = $sum % 11;
+        $secondSum += intval($cnpj[12]) * 2;
 
-        return $cnpj[13] == ($remainder < 2 ? 0 : 11 - $remainder);
+        $firstRemainder = $firstSum % 11;
+        $firstDigit = $firstRemainder < 2 ? 0 : 11 - $firstRemainder;
+
+        $secondRemainder = $secondSum % 11;
+        $secondDigit = $secondRemainder < 2 ? 0 : 11 - $secondRemainder;
+
+        return (($cnpj[12] == $firstDigit) and ($cnpj[13] == $secondDigit));
     }
 
     /**

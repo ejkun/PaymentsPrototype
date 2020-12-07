@@ -10,26 +10,13 @@ class OneOf implements Rule
 
     private string $message;
 
-    /**
-     * Create a new rule instance.
-     *
-     * @param string $message
-     * @param Rule[] $rules
-     */
     public function __construct(string $message, Rule ...$rules)
     {
         $this->rules = $rules;
         $this->message = $message;
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
         $result = false;
 
@@ -37,7 +24,7 @@ class OneOf implements Rule
             $result |= $rule->passes($attribute, $value);
         });
 
-        return $result;
+        return (bool) $result;
     }
 
     /**

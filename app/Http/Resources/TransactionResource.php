@@ -11,6 +11,8 @@ class TransactionResource extends JsonResource
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function toArray($request)
     {
