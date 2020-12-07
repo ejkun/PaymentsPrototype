@@ -50,4 +50,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'balance' => 'float'
     ];
+
+    public function setDocumentAttribute(string $value)
+    {
+        $this->attributes['document'] = preg_replace('/\D/', '', $value);
+    }
 }
