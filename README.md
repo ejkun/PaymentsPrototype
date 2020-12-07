@@ -7,13 +7,9 @@ This is a prototype for a payments service. Included here are endpoints for crea
 To install this project simply clone this repository and run the following command
 
 ```bash
-./composer.sh install
-```
-
-To run the application bring up the docker container
-
-```bash
+cp .env.example .env
 docker-compose up -d
+./composer.sh install
 ```
 
 Then run the migrate command
