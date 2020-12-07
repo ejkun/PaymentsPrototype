@@ -16,5 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResource('users', UserController::class);
-Route::apiResource('transactions', TransactionController::class)->except('update', 'destroy');
+Route::prefix('v1')->group(function () {
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('transactions', TransactionController::class)->except('update', 'destroy');
+});
