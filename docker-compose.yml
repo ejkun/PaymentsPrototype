@@ -52,13 +52,17 @@ services:
           - dbdata:/var/lib/mysql
           - ./mysql/my.cnf:/etc/mysql/my.cnf
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - mysql
 
   redis:
     image: redis
     container_name: redis
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - redis
 
 #Docker Networks
 networks:

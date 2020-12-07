@@ -16,9 +16,11 @@ class CreateTransactionsTable extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('payer_id')
+                ->nullable()
                 ->constrained('users')
                 ->onDelete('set null');
             $table->foreignId('payee_id')
+                ->nullable()
                 ->constrained('users')
                 ->onDelete('set null');
             $table->float('value');
@@ -33,6 +35,10 @@ class CreateTransactionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payments');
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('payer_id');
+            $table->dropConstrainedForeignId('payee_id');
+        });
+        Schema::dropIfExists('transactions');
     }
 }

@@ -40,9 +40,10 @@ class StoreUser extends FormRequest
             ],
             'document' => [
                 'required',
-                new OneOf("The data must be a valid CPF or CNPJ", new Cpf(), new Cnpj())
+                'unique:users',
+                new OneOf("The data must be a valid CPF or CNPJ", new Cpf(), new Cnpj()),
             ],
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'password' => 'required|confirmed',
             'password_confirmation' => 'required'
         ];
