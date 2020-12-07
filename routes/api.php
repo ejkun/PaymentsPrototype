@@ -17,4 +17,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::apiResource('users', UserController::class);
-Route::apiResource('transactions', TransactionController::class)->only('index', 'store');
+Route::apiResource('transactions', TransactionController::class)->except('update', 'destroy');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyUser;
 use App\Http\Requests\StoreUser;
 use App\Http\Requests\UpdateUser;
 use App\Http\Resources\UserResource;
@@ -41,22 +42,15 @@ class UserController extends Controller
 
     public function update(UpdateUser $request, User $user)
     {
-        $updated = $this->service->update($user, $request->validated());
-
-        if (!$updated) {
-            return new JsonResponse('Unknown error', Response::HTTP_BAD_REQUEST);
-        }
+        $this->service->update($user, $request->validated());
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function destroy(User $user)
+    public function destroy(DestroyUser $request, User $user)
     {
-        $destroyed = $this->service->destroy($user);
-
-        if (!$destroyed) {
-            return new JsonResponse('Unknown error', Response::HTTP_BAD_REQUEST);
-        }
+        $request->validated();
+        $this->service->destroy($user);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }

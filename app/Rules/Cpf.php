@@ -48,6 +48,6 @@ class Cpf implements Rule
      */
     public function message()
     {
-        return 'The data is not a valid CPF';
+        return 'The field :attribute is not a valid CPF';
     }
 }

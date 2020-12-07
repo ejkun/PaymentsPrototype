@@ -56,6 +56,35 @@ class TransactionControllerTest extends TestCase
         ]);
     }
 
+    public function testApiShowsATransaction()
+    {
+        $this->fakeApproverReturnedApproved();
+        $this->fakeNotifierReturnedSent();
+
+        $transaction = Transaction::factory()->create([
+            'payer_id' => $this->payer->id,
+            'payee_id' => $this->payee->id
+        ])->toArray();
+
+        unset($transaction['updated_at']);
+
+        $response = $this->getJson(route('transactions.show', [
+            'transaction' => $transaction['id']
+        ]));
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson($transaction);
+    }
+
+    public function testApiReturnsNotFoundWhenTransactionDoesNotExist()
+    {
+        $response = $this->getJson(route('transactions.show', [
+            'transaction' => $this->faker->randomNumber()
+        ]));
+
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
     public function testApiStoresATransactionAndNotifies()
     {
         $this->fakeApproverReturnedApproved();

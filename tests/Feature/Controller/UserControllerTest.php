@@ -61,6 +61,23 @@ class UserControllerTest extends TestCase
         ));
     }
 
+    public function testApiFailsToStoresAUserWithInvalidDocument()
+    {
+        $password = $this->faker->password;
+        $user = User::factory()->make([
+            'document' => '00000000000'
+        ])
+            ->toArray();
+
+        $user['password'] = $password;
+        $user['password_confirmation'] = $password;
+
+        $response = $this->postJson(route('users.store'), $user);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['document']);
+    }
+
     public function testApiUpdatesAUser()
     {
         $password = $this->faker->password;
@@ -88,6 +105,32 @@ class UserControllerTest extends TestCase
         ]);
     }
 
+    public function testApiFailToUpdateAUserWithWrongPassword()
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make($this->faker->password)
+        ]);
+
+        $newName = $this->faker->name;
+
+        $response = $this
+            ->putJson(
+                route('users.update', ['user' => $user->id]),
+                [
+                    'name' => $newName,
+                    'current_password' => $this->faker->password
+                ]
+            );
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['current_password']);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => $user->name
+        ]);
+    }
+
     public function testApiDestroysAUser()
     {
         $password = $this->faker->password;
@@ -107,6 +150,28 @@ class UserControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_NO_CONTENT);
 
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id
+        ]);
+    }
+
+    public function testApiFailsToDestroyAUserWithWrongPassword()
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make($this->faker->password)
+        ]);
+
+        $response = $this
+            ->deleteJson(
+                route('users.destroy', ['user' => $user->id]),
+                [
+                    'current_password' => $this->faker->password
+                ]
+            );
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['current_password']);
+
+        $this->assertDatabaseHas('users', [
             'id' => $user->id
         ]);
     }

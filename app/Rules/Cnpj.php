@@ -54,6 +54,6 @@ class Cnpj implements Rule
      */
     public function message()
     {
-        return 'The data is not a valid CNPJ';
+        return 'The field :attribute is not a valid CNPJ';
     }
 }

@@ -29,11 +29,7 @@ class UserService
 
     public function destroy(User $user): bool
     {
-        try {
-            return $user->delete();
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $user->delete();
     }
 
     private function cryptPassword(array &$data): void

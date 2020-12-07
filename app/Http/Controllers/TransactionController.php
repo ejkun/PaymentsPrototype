@@ -38,10 +38,10 @@ class TransactionController extends Controller
         );
     }
 
-    public function show(Transaction $payment)
+    public function show(Transaction $transaction)
     {
         return new JsonResponse(
-            new TransactionResource($payment),
+            new TransactionResource($transaction),
             Response::HTTP_OK
         );
     }
