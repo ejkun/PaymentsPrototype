@@ -52,9 +52,9 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $deleted = $this->service->destroy($user);
+        $destroyed = $this->service->destroy($user);
 
-        if (!$deleted) {
+        if (!$destroyed) {
             return new JsonResponse('Unknown error', Response::HTTP_BAD_REQUEST);
         }
 

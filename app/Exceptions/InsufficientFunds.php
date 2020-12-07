@@ -5,7 +5,7 @@ namespace App\Exceptions;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class InsufficientFundsException extends HttpException
+class InsufficientFunds extends HttpException
 {
     public function __construct()
     {

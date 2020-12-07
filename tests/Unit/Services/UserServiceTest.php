@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unity\Services\UserServiceTest;
+namespace Tests\Unit\Services\UserServiceTest;
 
 use App\Models\User;
 use App\Services\UserService;
@@ -60,9 +60,9 @@ class UserServiceTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $deleted = $this->service->destroy($user);
+        $destroyed = $this->service->destroy($user);
 
-        $this->assertTrue($deleted);
+        $this->assertTrue($destroyed);
         $this->assertDatabaseMissing('users', $user->toArray());
     }
 }

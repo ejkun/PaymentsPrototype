@@ -1,19 +1,22 @@
 <?php
 
-namespace Tests\Unity\Services\UserServiceTest;
+namespace Tests\Unit\Services\UserServiceTest;
 
-use App\Exceptions\InsufficientFundsException;
+use App\Exceptions\InsufficientFunds;
 use App\Exceptions\TransactionRejectedByApprover;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\TransactionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
+use Tests\Traits\HasHTTPFakers;
+use Tests\Traits\HasNotificationHelpers;
 
 class TransactionServiceTest extends TestCase
 {
+    use HasHTTPFakers;
+    use HasNotificationHelpers;
     use RefreshDatabase;
     use WithFaker;
 
@@ -26,7 +29,8 @@ class TransactionServiceTest extends TestCase
         parent::setUp();
 
         $this->payer = User::factory()->create([
-            'type' => User::REGULAR
+            'type' => User::REGULAR,
+            'balance' => $this->faker->randomFloat(2, 0.01)
         ]);
         $this->payee = User::factory()->create();
         $this->service = app(TransactionService::class);
@@ -34,6 +38,9 @@ class TransactionServiceTest extends TestCase
 
     public function testItIndexTransactions()
     {
+        $this->fakeApproverReturnedApproved();
+        $this->fakeNotifierReturnedSent();
+
         $transactions = Transaction::factory()->count(5)->create([
             'payer_id' => $this->payer->id,
             'payee_id' => $this->payee->id
@@ -45,8 +52,11 @@ class TransactionServiceTest extends TestCase
         );
     }
 
-    public function testItStoresATransaction()
+    public function testItStoresATransactionAndNotifies()
     {
+        $this->fakeNotifierReturnedSent();
+        $this->fakeApproverReturnedApproved();
+
         $value = $this->faker->randomFloat(2, 0.01, $this->payer->balance);
 
         $transaction = $this->service->store($this->payer, $this->payee, $value);
@@ -63,6 +73,8 @@ class TransactionServiceTest extends TestCase
             $this->assertEquals($value, $transaction->$key);
         });
         $this->assertDatabaseHas('transactions', $expectedData);
+
+        $this->assertNotificationEmitted($transaction);
     }
 
     public function testItThrowsInsufficientFundsException()
@@ -71,7 +83,7 @@ class TransactionServiceTest extends TestCase
 
         try {
             $this->service->store($this->payer, $this->payee, $value);
-        } catch (InsufficientFundsException $exception) {
+        } catch (InsufficientFunds $exception) {
             $this->assertTrue(true, 'This line was not called');
         }
 
@@ -84,7 +96,7 @@ class TransactionServiceTest extends TestCase
 
     public function testItThrowsTransactionRejectedByApprover()
     {
-        Config::set('services.transaction.approver', '');
+        $this->fakeApproverReturnedNotApproved();
 
         $value = $this->faker->randomFloat(2, 0.01, $this->payer->balance);
 
@@ -92,6 +104,31 @@ class TransactionServiceTest extends TestCase
             $this->service->store($this->payer, $this->payee, $value);
         } catch (TransactionRejectedByApprover $exception) {
             $this->assertTrue(true, 'This line was not called');
+        }
+
+        $this->assertDatabaseMissing('transactions', [
+            'payer_id' => $this->payer->id,
+            'payee_id' => $this->payee->id,
+            'value' => $value
+        ]);
+    }
+
+    public function testItThrowsTransactionFailedToBeApproved()
+    {
+        $this->fakeApproverReturnedError();
+
+        $value = $this->faker->randomFloat(2, 0.01, $this->payer->balance);
+
+        try {
+            $this->service->store($this->payer, $this->payee, $value);
+        } catch (TransactionRejectedByApprover $exception) {
+            $this->assertTrue(true, 'This line was not called');
+        } catch (InsufficientFunds $exception) {
+            dd([
+                'payer' => $this->payer->toArray(),
+                'payee' => $this->payee->toArray(),
+                'value' => $value
+            ]);
         }
 
         $this->assertDatabaseMissing('transactions', [

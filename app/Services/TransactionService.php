@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\InsufficientFundsException;
+use App\Exceptions\InsufficientFunds;
 use App\Exceptions\InvalidPayerType;
 use App\Exceptions\TransactionRejectedByApprover;
 use App\Models\Transaction;
@@ -28,7 +28,7 @@ class TransactionService
     public function store(User $payer, User $payee, float $value): Transaction
     {
         if ($payer->balance < $value) {
-            throw new InsufficientFundsException();
+            throw new InsufficientFunds();
         }
 
         if ($payer->type != User::REGULAR) {

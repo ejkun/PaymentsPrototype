@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Hash;
 
 class UpdateUser extends FormRequest
 {
@@ -27,7 +28,15 @@ class UpdateUser extends FormRequest
             'name' => 'sometimes|string',
             'password' => 'sometimes|string|confirmed',
             'password_confirmation' => 'sometimes|required_with:password',
-            'current_password' => 'required|password'
+            'current_password' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Hash::check($value, $this->route('user')->password)) {
+                        $fail("Current password is invalid");
+                    }
+                }
+            ]
         ];
     }
 }

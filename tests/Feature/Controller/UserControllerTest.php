@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -73,7 +72,6 @@ class UserControllerTest extends TestCase
         $newName = $this->faker->name;
 
         $response = $this
-            ->actingAs($user)
             ->putJson(
                 route('users.update', ['user' => $user->id]),
                 [
@@ -90,7 +88,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    public function testApiDeletesAUser()
+    public function testApiDestroysAUser()
     {
         $password = $this->faker->password;
         $cryptedPassword = Hash::make($password);
@@ -99,7 +97,6 @@ class UserControllerTest extends TestCase
         ]);
 
         $response = $this
-            ->actingAs($user)
             ->deleteJson(
                 route('users.destroy', ['user' => $user->id]),
                 [
