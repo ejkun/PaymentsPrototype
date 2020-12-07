@@ -54,6 +54,12 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis
+    container_name: redis
+    networks:
+      - app-network
+
 #Docker Networks
 networks:
   app-network:
